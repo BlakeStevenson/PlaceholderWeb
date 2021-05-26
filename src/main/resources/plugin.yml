@@ -1,0 +1,5 @@
+name: PlaceholderWeb
+api-version: 1.16
+version: 1.0-SNAPSHOT
+main: me.blake.papiweb.PlaceholderWeb
+depend: ["PlaceholderAPI"]
