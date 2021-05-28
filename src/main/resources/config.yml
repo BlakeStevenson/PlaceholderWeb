@@ -1,2 +1,8 @@
+# port to listen on
 port: 8000
-keys: ["2284bae7-09e1-4515-8169-575ca6bad7b3"]
+# requires all requests to have a key attached
+auth: false
+# used if auth is enabled
+keys: []
+# debug mode - prints request information in console.
+debug: false

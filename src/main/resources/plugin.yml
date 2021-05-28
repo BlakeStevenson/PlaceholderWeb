@@ -3,3 +3,9 @@ api-version: 1.16
 version: 1.0-SNAPSHOT
 main: me.blake.papiweb.PlaceholderWeb
 depend: ["PlaceholderAPI"]
+commands:
+  placeholderweb:
+    description: Manage PlaceholderWeb
+    usage: /<command> <generate/reload/debug/generateurl>
+    aliases: ["pweb"]
+    permission: placeholderweb.admin
