@@ -15,7 +15,6 @@ import java.util.logging.Level;
 
 public class PlaceholderWeb extends JavaPlugin {
 
-    private Javalin app = null;
     private ServerThread server;
     @Override
     public void onEnable() {
@@ -26,7 +25,8 @@ public class PlaceholderWeb extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        app.stop();
+        server.getApp().stop();
+        server.interrupt();
     }
 
     private void setupWebServer() {
