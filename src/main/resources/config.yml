@@ -6,3 +6,5 @@ auth: false
 keys: []
 # debug mode - prints request information in console.
 debug: false
+
+separator: ","

@@ -37,7 +37,7 @@ public class PlaceholderWebCommand implements CommandExecutor {
                 return true;
             } else if (args[0].equals("reload")) {
                 plugin.reloadConfig();
-                plugin.restartSever();
+                plugin.restartServer();
                 sender.sendMessage(ChatColor.GREEN + "[PlaceholderWeb] Reloaded!");
                 return true;
             } else if (args[0].equals("debug")) {

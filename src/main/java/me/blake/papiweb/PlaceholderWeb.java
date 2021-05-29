@@ -16,7 +16,7 @@ import java.util.logging.Level;
 public class PlaceholderWeb extends JavaPlugin {
 
     private Javalin app = null;
-
+    private ServerThread server;
     @Override
     public void onEnable() {
         this.getCommand("placeholderweb").setExecutor(new PlaceholderWebCommand(this));
@@ -37,33 +37,14 @@ public class PlaceholderWeb extends JavaPlugin {
         Thread.currentThread().setContextClassLoader(PlaceholderWeb.class.getClassLoader());
 
         // Instantiate the web server (which will now load using the plugin's class loader).
-        app = Javalin.create().start(this.getConfig().getInt("port"));
-        app.get("/:player/:placeholder", ctx -> {
-            if(this.getConfig().getBoolean("debug")) {
-                this.getLogger().log(Level.INFO, ctx.ip() + ": " + ctx.method() + " " + ctx.fullUrl() + " " + ctx.status());
-            }
-            if(this.getConfig().getStringList("keys").contains(ctx.queryParam("key")) || !this.getConfig().getBoolean("auth")) {
-                ctx.contentType("application/json");
-                ctx.result(getPlaceholders(ctx));
-            } else {
-                ctx.status(401);
-                ctx.contentType("text/plain");
-                ctx.result("401 Unauthorized\n" + this.getDescription().getName() + " v" + this.getDescription().getVersion());
-            }
-        });
-        app.get("/*", ctx -> {
-            if(this.getConfig().getBoolean("debug")) {
-                this.getLogger().log(Level.INFO, ctx.ip() + ": " + ctx.method() + " " + ctx.fullUrl() + " " + ctx.status());
-            }
-            ctx.status(404);
-            ctx.result("404 Not Found\n" + this.getDescription().getName() + " v" + this.getDescription().getVersion());
-        });
+        server = new ServerThread(this);
+        server.start();
 
         // Put the original class loader back where it was.
         Thread.currentThread().setContextClassLoader(classLoader);
     }
 
-    private String getPlaceholders(Context ctx) {
+    public String getPlaceholders(Context ctx) {
         Server server = this.getServer();
         OfflinePlayer player;
         if (ctx.pathParam("player").matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}")) {
@@ -73,8 +54,8 @@ public class PlaceholderWeb extends JavaPlugin {
         }
 
         Map<String, String> output = new HashMap<>();
-        if (ctx.pathParam("placeholder").contains(",")) {
-            String[] placeholders = ctx.pathParam("placeholder").split(",");
+        if (ctx.pathParam("placeholder").contains(this.getConfig().getString("separator"))) {
+            String[] placeholders = ctx.pathParam("placeholder").split(this.getConfig().getString("separator"));
             for (String p : placeholders) {
                 output.put(p, PlaceholderAPI.setPlaceholders(player, "%" + p + "%"));
             }
@@ -86,8 +67,12 @@ public class PlaceholderWeb extends JavaPlugin {
         return gson.toJson(output);
     }
 
-    public void restartSever() {
-        app.stop();
+    public ServerThread getServerThread() {
+        return server;
+    }
+    public void restartServer() {
+        server.getApp().stop();
+        server.interrupt();
         setupWebServer();
     }
 }
