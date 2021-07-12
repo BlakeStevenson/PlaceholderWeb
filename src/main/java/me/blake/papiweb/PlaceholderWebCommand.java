@@ -1,9 +1,12 @@
 package me.blake.papiweb;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
@@ -60,8 +63,24 @@ public class PlaceholderWebCommand implements CommandExecutor {
                         plugin.getLogger().log(Level.SEVERE, "No server IP found!");
                     }
                     assert ip != null;
-                    sender.sendMessage(ChatColor.GREEN + "http://" + ip.getHostAddress() + ":" + plugin.getConfig().getInt("port") + "/" + args[1] + "/" + args[2]);
-                    return true;
+                    if(plugin.getConfig().getString("auth").contains("true")) {
+                        sender.sendMessage(ChatColor.RED + "Auth is Enabled, url will be generated with a key!");
+                        List<String> uuidkey = plugin.getConfig().getStringList("keys");
+                        for (String keys2 : uuidkey) {
+                            //plugin.getConfig().getString("keys.");
+                            TextComponent component = new TextComponent(ChatColor.GREEN + "http://" + ip.getHostAddress() + ":" + plugin.getConfig().getInt("port") + "/" + args[1] + "/" + args[2] + "?key=" + keys2.replaceAll("[\\[\\],]",""));
+                            String url = ("http://" + ip.getHostAddress() + ":" + plugin.getConfig().getInt("port") + "/" + args[1] + "/" + args[2] + "?key=" + keys2.replaceAll("[\\[\\],]",""));
+                            component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+                            sender.spigot().sendMessage(component);
+                        }
+                        return true;
+                    } else {
+                        TextComponent component = new TextComponent(ChatColor.GREEN + "http://" + ip.getHostAddress() + ":" + plugin.getConfig().getInt("port") + "/" + args[1] + "/" + args[2]);
+                        String url = ("http://" + ip.getHostAddress() + ":" + plugin.getConfig().getInt("port") + "/" + args[1] + "/" + args[2]);
+                        component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+                        sender.spigot().sendMessage(component);
+                        return true;
+                    }
                 }
             } else if(args[0].equals("generateurl")) {
                 sender.sendMessage(ChatColor.RED + "Usage: /placeholderweb generateurl <player> <placeholders>");
@@ -71,4 +90,7 @@ public class PlaceholderWebCommand implements CommandExecutor {
 
         return false;
     }
+//    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+//
+//    }
 }
