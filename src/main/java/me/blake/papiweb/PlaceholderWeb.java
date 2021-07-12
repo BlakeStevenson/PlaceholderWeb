@@ -19,6 +19,7 @@ public class PlaceholderWeb extends JavaPlugin {
     @Override
     public void onEnable() {
         this.getCommand("placeholderweb").setExecutor(new PlaceholderWebCommand(this));
+        this.getCommand("placeholderweb").setTabCompleter(new PlaceholderWebTabCompletion());
         this.saveDefaultConfig();
         setupWebServer();
     }
@@ -65,6 +66,7 @@ public class PlaceholderWeb extends JavaPlugin {
         }
         Gson gson = new Gson();
         return gson.toJson(output);
+
     }
 
     public ServerThread getServerThread() {
@@ -74,5 +76,6 @@ public class PlaceholderWeb extends JavaPlugin {
         server.getApp().stop();
         server.interrupt();
         setupWebServer();
+
     }
 }

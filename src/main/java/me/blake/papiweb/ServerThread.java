@@ -14,6 +14,7 @@ public class ServerThread extends Thread {
 
     @Override
     public void run() {
+
         app = Javalin.create().start(plugin.getConfig().getInt("port"));
         app.get("/:player/:placeholder", ctx -> {
             if(plugin.getConfig().getBoolean("debug")) {
